@@ -14,12 +14,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
     private static final String database_name = "database.db";
     private static final String studentTableName = "Students";
     private static final String majorTableName = "Majors";
+    private DataHelper dh = new DataHelper();
 
     //constructor
     public DatabaseHelper(Context c)
     {
-        super(c, database_name, null, 2);
+        super(c, database_name, null, 4);
     }
+
 
     @Override
     public void onConfigure(SQLiteDatabase db)
@@ -63,8 +65,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         //add student to database
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("INSERT INTO " + studentTableName + "(username, fname, lname, email, age, gpa) VALUES ('" + student.getUsername() + "', '" + student.getFname() + "', '" + student.getLname() + "', '" + student.getEmail() + "', '" + student.getAge() + "', '" + student.getGpa() + "');");
+        db.execSQL("INSERT INTO " + studentTableName + "(username, fname, lname, email, age, gpa, major) VALUES ('" + student.getUsername() + "', '" + student.getFname() + "', '" + student.getLname() + "', '" + student.getEmail() + "', '" + student.getAge() + "', '" + student.getGpa() + "', '" + student.getMajorId() + "'" + ");");
         db.close();
+        dh.setStudentList(getAllStudents());
     }
 
     public void addMajor(MajorObj major)
@@ -73,27 +76,28 @@ public class DatabaseHelper extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("INSERT INTO " + majorTableName + "(majorName, majorPrefix) VALUES ('" + major.getMajorName() + "', '" + major.getMajorPrefix() + "');");
         db.close();
+        dh.setMajorList(getAllMajors());
     }
 
-    private Cursor getAllStudents()
+    private Cursor getStudentCursor()
     {
         //part 1 of getting all the entries from the student table
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + studentTableName, null);
     }
-    private Cursor getAllMajors()
+    private Cursor getMajorCursor()
     {
         //part 1 of getting all the entries from the major table
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + majorTableName, null);
     }
 
-    public ArrayList<StudentObj> getStudents()
+    private ArrayList<StudentObj> getAllStudents()
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<StudentObj> studentList = new ArrayList<>();
         //part 2 of getting all the students form the students table
-        Cursor cursor = getAllStudents();
+        Cursor cursor = getStudentCursor();
         if(cursor != null && cursor.getCount() > 0)
         {
             while (cursor.moveToNext())
@@ -105,7 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 student.setUsername(cursor.getString((int) cursor.getColumnIndex("username")));
                 student.setAge(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("age"))));
                 student.setGpa(Float.parseFloat(cursor.getString((int) cursor.getColumnIndex("gpa"))));
-                //student.setMajorId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("major"))));
+                student.setMajorId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("major"))));
                 student.setUserId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("id"))));
                 studentList.add(student);
             }
@@ -122,11 +126,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return studentList;
     }
 
-    public ArrayList<MajorObj> getMajors()
+    private ArrayList<MajorObj> getAllMajors()
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<MajorObj> majorList = new ArrayList<>();
-        Cursor cursor = getAllMajors();
+        Cursor cursor = getMajorCursor();
         if(cursor != null && cursor.getCount() > 0)
         {
             while (cursor.moveToNext())
@@ -150,6 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return majorList;
     }
 
+    //The getStudent is most likely redundant and unneeded
     public StudentObj getStudent(int id)
     {
         StudentObj student = new StudentObj();
@@ -182,6 +187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return student;
     }
 
+    //getMajor is most likely redundant and unneeded
     public MajorObj getMajor(int id)
     {
         MajorObj major = new MajorObj();
@@ -215,7 +221,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     private boolean validMajorId(int id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        String checkCommand = "SELECT count(id) FROM " + majorTableName + " WHERE majorId = '" + id + "';";
+        String checkCommand = "SELECT count(majorId) FROM " + majorTableName + " WHERE majorId = '" + id + "';";
         Cursor cursor = db.rawQuery(checkCommand, null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
@@ -246,5 +252,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         {
             return false;
         }
+    }
+
+    public void getEntries()
+    {
+        dh.setMajorList(getAllMajors());
+        dh.setStudentList(getAllStudents());
     }
 }

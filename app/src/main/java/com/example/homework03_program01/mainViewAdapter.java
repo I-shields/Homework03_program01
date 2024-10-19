@@ -15,15 +15,13 @@ public class mainViewAdapter extends BaseAdapter
 {
 
     private DataHelper dh = new DataHelper();
-    private DatabaseHelper dbh;
     private ArrayList<StudentObj> studentList;
     Context context;
 
     public mainViewAdapter(Context c)
     {
         context = c;
-        dbh = new DatabaseHelper(c);
-        studentList = dbh.getStudents();
+        studentList = dh.getStudentList();
     }
 
     @Override

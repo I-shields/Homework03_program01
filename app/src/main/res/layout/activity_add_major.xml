@@ -75,9 +75,9 @@
         android:id="@+id/amj_btn_cancel"
         android:layout_width="233dp"
         android:layout_height="46dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="39dp"
         android:layout_marginEnd="89dp"
-        android:text="cancel"
+        android:text="Done"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amj_btn_saveMajor" />
 
@@ -93,4 +93,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amj_et_majorPrefix"
         app:layout_constraintVertical_bias="1.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

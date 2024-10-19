@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     Intent addStudentScreen;
     Intent searchStudentsScreen;
     mainViewAdapter adapter;
+    DatabaseHelper dbh = new DatabaseHelper(this);
+    private static int initialDatabaseRun = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
         searchStudentsScreen    = new Intent(this, searchStudents.class);
         ma_lv_studentList       = findViewById(R.id.am_lv_studentList);
 
+        if(initialDatabaseRun == 0)
+        {
+            dbh.getEntries();
+            initialDatabaseRun++;
+        }
 
         adapter = new mainViewAdapter(this);
         ma_lv_studentList.setAdapter(adapter);

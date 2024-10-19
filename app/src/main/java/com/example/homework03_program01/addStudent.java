@@ -2,8 +2,10 @@ package com.example.homework03_program01;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class addStudent extends AppCompatActivity {
@@ -33,10 +36,14 @@ public class addStudent extends AppCompatActivity {
     TextView tv_opSM;
     ArrayList<MajorObj> majorList = new ArrayList<MajorObj>();
     ArrayList<String> majorNames = new ArrayList<String>();
+    ArrayList<StudentObj> studentList = new ArrayList<StudentObj>();
     DataHelper dh = new DataHelper();
     Button mainMenu;
     Intent mainView;
+    int majorId;
     DatabaseHelper dbh;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,29 +63,29 @@ public class addStudent extends AppCompatActivity {
         tv_opSM                = findViewById(R.id.as_tv_opSM);
         mainMenu               = findViewById(R.id.as_btn_mainMenu);
         mainView               = new Intent(this, MainActivity.class);
+        majorList              = dh.getMajorlist();
+        studentList            = dh.getStudentList();
         dbh                    = new DatabaseHelper(this);
 
-        if(dh.tempStudent != null)
-        {
-            fillTempData();
-        }
-
-        majorList = dbh.getMajors();
         majorNames.add("Majors");
         for(MajorObj major : majorList)
         {
             majorNames.add(major.getMajorName());
-        }
 
+        }
+        //add the majors to the drop down everytime this "screen" is opened
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,majorNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_majorSpinner.setAdapter(adapter);
 
-
         addMajorClick();
         saveBtnClick();
         mainMenuBtnClick();
-
+        getMajorId();
+        if(dh.getTempStudent() != null)
+        {
+            fillTempData(dh.getTempStudent());
+        }
 
     }
 
@@ -98,7 +105,7 @@ public class addStudent extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
-                saveData();
+                saveTempData();
                 startActivity(addMajorIntent);
             }
         });
@@ -115,7 +122,6 @@ public class addStudent extends AppCompatActivity {
                     {
                         addStudentToDatabase();
                         tv_opSM.setText("Student added");
-                        dh.tempStudent = null;
                         clearBoxes();
                     }
                     else
@@ -146,9 +152,9 @@ public class addStudent extends AppCompatActivity {
     private boolean checkUsername()
     {
         boolean validUname = true;
-        if(!dbh.getStudents().isEmpty())
+        if(!studentList.isEmpty())
         {
-            for(StudentObj student : dbh.getStudents())
+            for(StudentObj student : studentList)
             {
                 if(student.getUsername().equalsIgnoreCase(et_uName.getText().toString()))
                 {
@@ -168,73 +174,111 @@ public class addStudent extends AppCompatActivity {
         et_gpa.setText(null);
         et_age.setText(null);
         spinner_majorSpinner.setSelection(0);
+        tv_opSM.setText(null);
     }
 
     private void addStudentToDatabase()
     {
         StudentObj student = new StudentObj();
-
         student.setFname(et_fName.getText().toString());
         student.setLname(et_lName.getText().toString());
         student.setUsername(et_uName.getText().toString());
         student.setEmail(et_email.getText().toString());
         student.setAge(Integer.parseInt(et_age.getText().toString()));
         student.setGpa(Float.parseFloat(et_gpa.getText().toString()));
-        student.setMajorId(getMajorId());
-
+        student.setMajorId(majorId);
         dbh.addStudent(student);
 
     }
 
-    private void fillTempData()
+    private void fillTempData(StudentObj student)
     {
-        et_fName.setText(dh.tempStudent.getFname());
-        et_lName.setText(dh.tempStudent.getLname());
-        et_uName.setText(dh.tempStudent.getUsername());
-        et_email.setText(dh.tempStudent.getEmail());
-        et_age.setText(dh.tempStudent.getAge());
-        et_gpa.setText(String.valueOf(dh.tempStudent.getGpa()));
-    }
-
-    private int getMajorId()
-    {
-        int id = 0;
-        for(MajorObj major : dbh.getMajors())
+        et_fName.setText(student.getFname());
+        et_lName.setText(student.getLname());
+        et_uName.setText(student.getUsername());
+        et_email.setText(student.getEmail());
+        if(student.getAge() == 0)
         {
-            if(major.getMajorName().equalsIgnoreCase(spinner_majorSpinner.getItemAtPosition((int) spinner_majorSpinner.getSelectedItemId()).toString()))
-            {
-                id = major.getMajorId();
-            }
+            et_age.setText(null);
+        }
+        else
+        {
+            et_age.setText(String.valueOf(student.getAge()));
         }
 
-        return id;
+        if(student.getGpa() == 0)
+        {
+            et_gpa.setText(null);
+        }
+        else
+        {
+            et_gpa.setText(String.valueOf(student.getGpa()));
+        }
     }
 
-    private void saveData()
+    private void getMajorId()
     {
+
+        spinner_majorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if(i != 0)
+                {
+                    Log.d("ID of Selected ITEM", i + "");
+                    String selectedMajorName = adapterView.getItemAtPosition(i).toString();
+                    for(MajorObj mObj : majorList)
+                    {
+                        if(mObj.getMajorName().equalsIgnoreCase(selectedMajorName))
+                        {
+                            majorId = mObj.getMajorId();
+                        }
+                    }
+                }
+                Log.d("MAJOR NUMBER", majorId + "");
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
+
+    private void saveTempData()
+    {
+        StudentObj student = new StudentObj();
         if(!et_fName.getText().toString().isEmpty())
         {
-            dh.tempStudent.setFname(et_fName.getText().toString());
+            student.setFname(et_fName.getText().toString());
+            Log.d("FNAME CHECK!!!", "In fname");
         }
         if(!et_lName.getText().toString().isEmpty())
         {
-            dh.tempStudent.setLname(et_lName.getText().toString());
+            student.setLname(et_lName.getText().toString());
         }
         if(!et_uName.getText().toString().isEmpty())
         {
-            dh.tempStudent.setUsername(et_uName.getText().toString());
+            student.setUsername(et_uName.getText().toString());
         }
         if(!et_email.getText().toString().isEmpty())
         {
-            dh.tempStudent.setEmail(et_email.getText().toString());
+            student.setEmail(et_email.getText().toString());
         }
         if(!et_age.getText().toString().isEmpty())
         {
-            dh.tempStudent.setAge(Integer.parseInt(et_age.getText().toString()));
+            student.setAge(Integer.parseInt(et_age.getText().toString()));
+            Log.d("Age CHECK!!!", "In age");
         }
         if(!et_gpa.getText().toString().isEmpty())
         {
-            dh.tempStudent.setGpa(Float.parseFloat(et_gpa.getText().toString()));
+            student.setGpa(Float.parseFloat(et_gpa.getText().toString()));
         }
+
+        dh.setTempStudent(student);
     }
+
+
 }

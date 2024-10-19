@@ -13,6 +13,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+
 public class addMajor extends AppCompatActivity {
 
 
@@ -23,6 +25,8 @@ public class addMajor extends AppCompatActivity {
     Intent addStudentIntent;
     TextView tv_opSM;
     DatabaseHelper dbh;
+    DataHelper dh;
+    ArrayList<MajorObj> majorList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +40,13 @@ public class addMajor extends AppCompatActivity {
         tv_opSM             = findViewById(R.id.amj_tv_opSM);
         addStudentIntent    = new Intent(this, addStudent.class);
         dbh                 = new DatabaseHelper(this);
+        dh                  = new DataHelper();
+        majorList           = dh.getMajorlist();
+
 
 
         goBackBtnListener();
+        saveBtnListener();
 
     }
 
@@ -51,6 +59,11 @@ public class addMajor extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void saveBtnListener()
+    {
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -58,7 +71,6 @@ public class addMajor extends AppCompatActivity {
                 if(checkData())
                 {
                     updateDatabase();
-                    startActivity(addStudentIntent);
                     tv_opSM.setText("Major Added");
                     clearBoxes();
                 }
@@ -86,9 +98,9 @@ public class addMajor extends AppCompatActivity {
         boolean validData = true;
         if(!et_majorName.getText().toString().isEmpty() && !et_majorPrefix.getText().toString().isEmpty())
         {
-            if(!dbh.getMajors().isEmpty())
+            if(!majorList.isEmpty())
             {
-                for(MajorObj major : dbh.getMajors())
+                for(MajorObj major : majorList)
                 {
                     if(major.getMajorName().equalsIgnoreCase(et_majorName.getText().toString()))
                     {

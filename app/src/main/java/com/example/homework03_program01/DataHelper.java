@@ -1,5 +1,8 @@
 package com.example.homework03_program01;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,11 +10,22 @@ public class DataHelper
 {
     private static ArrayList<StudentObj> studentList = new ArrayList<StudentObj>();
     private static ArrayList<MajorObj> majorList = new ArrayList<MajorObj>();
-    public StudentObj tempStudent;
+    private static StudentObj tempStudent;
 
     public DataHelper()
     {
 
+    }
+
+    public void setTempStudent(StudentObj student)
+    {
+        Log.d("DATAHELPER", "ADDED STUDENT");
+        tempStudent = student;
+    }
+
+    public StudentObj getTempStudent()
+    {
+        return tempStudent;
     }
 
     public ArrayList<StudentObj> getStudentList()
@@ -48,14 +62,13 @@ public class DataHelper
         }
     }
 
-    public void addStudent(StudentObj student)
+    public void setStudentList(ArrayList<StudentObj> stuList)
     {
-        studentList.add(student);
+        studentList = stuList;
     }
 
-    public void addMajor(MajorObj major)
+    public void setMajorList(ArrayList<MajorObj> mList)
     {
-        majorList.add(major);
+        majorList = mList;
     }
-
 }
