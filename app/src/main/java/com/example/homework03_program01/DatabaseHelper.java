@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -19,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     //constructor
     public DatabaseHelper(Context c)
     {
-        super(c, database_name, null, 4);
+        super(c, database_name, null, 9);
     }
 
 
@@ -34,10 +33,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         //create the major table
-        db.execSQL("CREATE TABLE " + majorTableName + " (majorId INTEGER PRIMARY KEY AUTOINCREMENT, majorName varchar(18), majorPrefix varchar(9))");
+        db.execSQL("CREATE TABLE " + majorTableName + " (majorId  INTEGER PRIMARY KEY AUTOINCREMENT, majorName varchar(18), majorPrefix varchar(9))");
 
         //crate the student table
-        db.execSQL("CREATE TABLE " + studentTableName + " (id INTEGER PRIMARY KEY AUTOINCREMENT, username varchar(20) NOT NULL UNIQUE, fname varchar(20)," +
+        db.execSQL("CREATE TABLE " + studentTableName + " (username varchar(20) NOT NULL UNIQUE PRIMARY KEY, fname varchar(20)," +
                    " lname varchar(20), email varchar(40), age INTEGER, gpa REAL, major INTEGER, FOREIGN KEY (major) REFERENCES " + majorTableName + " (majorId));");
     }
 
@@ -65,7 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         //add student to database
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("INSERT INTO " + studentTableName + "(username, fname, lname, email, age, gpa, major) VALUES ('" + student.getUsername() + "', '" + student.getFname() + "', '" + student.getLname() + "', '" + student.getEmail() + "', '" + student.getAge() + "', '" + student.getGpa() + "', '" + student.getMajorId() + "'" + ");");
+        db.execSQL("INSERT INTO " + studentTableName + "(username, fname, lname, email, age, gpa, major) VALUES ('" + student.getUsername() + "', '" + student.getFname() + "', '" + student.getLname() + "', '" + student.getEmail() + "', '" + student.getAge() + "', '" + student.getGpa() + "', '" + student.getMajorid() + "' " + ");");
         db.close();
         dh.setStudentList(getAllStudents());
     }
@@ -109,8 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 student.setUsername(cursor.getString((int) cursor.getColumnIndex("username")));
                 student.setAge(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("age"))));
                 student.setGpa(Float.parseFloat(cursor.getString((int) cursor.getColumnIndex("gpa"))));
-                student.setMajorId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("major"))));
-                student.setUserId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("id"))));
+                student.setMajorid(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("major"))));
                 studentList.add(student);
             }
         }
@@ -126,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return studentList;
     }
 
-    private ArrayList<MajorObj> getAllMajors()
+    public ArrayList<MajorObj> getAllMajors()
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<MajorObj> majorList = new ArrayList<>();
@@ -136,6 +134,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
             while (cursor.moveToNext())
             {
                 MajorObj major = new MajorObj();
+                major.setMajorId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("majorId"))));
                 major.setMajorName(cursor.getString((int) cursor.getColumnIndex("majorName")));
                 major.setMajorPrefix(cursor.getString((int) cursor.getColumnIndex("majorPrefix")));
                 majorList.add(major);
@@ -152,70 +151,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
 
         return majorList;
-    }
-
-    //The getStudent is most likely redundant and unneeded
-    public StudentObj getStudent(int id)
-    {
-        StudentObj student = new StudentObj();
-        if(validStudentId(id))
-        {
-            String selectCommand = "SELECT FROM " + studentTableName + " WHERE id = '" + id + "';";
-
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(selectCommand, null);
-
-            if(cursor != null && cursor.moveToFirst())
-            {
-                student.setFname(cursor.getString((int) cursor.getColumnIndex("fname")));
-                student.setLname(cursor.getString((int) cursor.getColumnIndex("lname")));
-                student.setEmail(cursor.getString((int) cursor.getColumnIndex("email")));
-                student.setUsername(cursor.getString((int) cursor.getColumnIndex("username")));
-                student.setAge(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("age"))));
-                student.setGpa(Float.parseFloat(cursor.getString((int) cursor.getColumnIndex("gpa"))));
-                student.setMajorId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("major"))));
-                student.setUserId(Integer.parseInt(cursor.getString((int) cursor.getColumnIndex("id"))));
-            }
-            if(cursor != null)
-            {
-                cursor.close();
-            }
-
-            db.close();
-        }
-
-        return student;
-    }
-
-    //getMajor is most likely redundant and unneeded
-    public MajorObj getMajor(int id)
-    {
-        MajorObj major = new MajorObj();
-
-        if(validMajorId(id))
-        {
-            String selectCommand = "SELECT FROM " + majorTableName + " WHERE majorId = '" + id + "';";
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(selectCommand, null);
-
-            if(cursor != null && cursor.moveToFirst())
-            {
-                major.setMajorPrefix(cursor.getString((int) cursor.getColumnIndex("majorPrefix")));
-                major.setMajorName(cursor.getString((int) cursor.getColumnIndex("majorName")));
-            }
-            if(db.isOpen())
-            {
-                db.close();
-            }
-            if(cursor != null)
-            {
-                cursor.close();
-            }
-        }
-
-
-
-        return major;
     }
 
     private boolean validMajorId(int id)
@@ -236,10 +171,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
     }
 
-    private boolean validStudentId(int id)
+    private boolean validStudentId(String uid)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        String checkCommand = "SELECT count(id) FROM " + studentTableName + " WHERE id = '" + id + "';";
+        String checkCommand = "SELECT count(username) FROM " + studentTableName + " WHERE username = '" + uid + "';";
         Cursor cursor = db.rawQuery(checkCommand, null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
@@ -258,5 +193,27 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         dh.setMajorList(getAllMajors());
         dh.setStudentList(getAllStudents());
+    }
+
+    public void updateStudent(StudentObj student)
+    {
+        if(validStudentId(student.getUsername()))
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.execSQL(" UPDATE " + studentTableName + " SET fname = '" + student.getFname() + "', lname = '" + student.getLname() + "', email = '" + student.getEmail() + "', username = '" + student.getUsername() + "', age = '" + student.getAge() + "', gpa = '" + student.getGpa() + "', major = '" + student.getMajorid() + "' WHERE username = '" + student.getUsername() + "';");
+            db.close();
+            dh.setStudentList(getAllStudents());
+        }
+    }
+
+    public void deleteStudent(String uname)
+    {
+        if(validStudentId(uname))
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.execSQL("DELETE FROM " + studentTableName + " WHERE username = '" + uname + "';");
+            db.close();
+            dh.setStudentList(getAllStudents());
+        }
     }
 }

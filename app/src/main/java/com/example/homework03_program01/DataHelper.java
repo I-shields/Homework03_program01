@@ -10,7 +10,29 @@ public class DataHelper
 {
     private static ArrayList<StudentObj> studentList = new ArrayList<StudentObj>();
     private static ArrayList<MajorObj> majorList = new ArrayList<MajorObj>();
+    private static ArrayList<StudentObj> searchList = new ArrayList<StudentObj>();
     private static StudentObj tempStudent;
+
+    public ArrayList<StudentObj> getSearchList()
+    {
+        return searchList;
+    }
+
+    public void setSearchList(ArrayList<StudentObj> searchList)
+    {
+        DataHelper.searchList = searchList;
+    }
+
+    public void addSearchResult(StudentObj student)
+    {
+        searchList.add(student);
+    }
+
+
+    public void clearSearchResults()
+    {
+        searchList.clear();
+    }
 
     public DataHelper()
     {

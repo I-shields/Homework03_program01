@@ -30,7 +30,7 @@ public class mainViewAdapter extends BaseAdapter
     }
 
     @Override
-    public Object getItem(int i) {
+    public StudentObj getItem(int i) {
         return studentList.get(i);
     }
 

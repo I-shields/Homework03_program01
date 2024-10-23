@@ -2,24 +2,19 @@ package com.example.homework03_program01;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class addStudent extends AppCompatActivity {
 
@@ -40,8 +35,10 @@ public class addStudent extends AppCompatActivity {
     DataHelper dh = new DataHelper();
     Button mainMenu;
     Intent mainView;
-    int majorId;
+    int majorId = -1;
     DatabaseHelper dbh;
+    Button btn_delete;
+    private static boolean updateMode = false;
 
 
     @Override
@@ -66,15 +63,17 @@ public class addStudent extends AppCompatActivity {
         majorList              = dh.getMajorlist();
         studentList            = dh.getStudentList();
         dbh                    = new DatabaseHelper(this);
+        btn_delete             = findViewById(R.id.as_btn_delete);
 
         majorNames.add("Majors");
         for(MajorObj major : majorList)
         {
             majorNames.add(major.getMajorName());
+            Log.d("NEW MAJOR IDS: ", major.getMajorId() + "");
 
         }
         //add the majors to the drop down everytime this "screen" is opened
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,majorNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, majorNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_majorSpinner.setAdapter(adapter);
 
@@ -82,11 +81,36 @@ public class addStudent extends AppCompatActivity {
         saveBtnClick();
         mainMenuBtnClick();
         getMajorId();
+        deleteBtn();
         if(dh.getTempStudent() != null)
         {
             fillTempData(dh.getTempStudent());
         }
+        if(studentList.contains(dh.getTempStudent()))
+        {
+            saveBtn.setText("Update");
+            updateMode = true;
+        }
+        else
+        {
+            updateMode = false;
+        }
 
+    }
+
+    private void deleteBtn()
+    {
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!et_uName.getText().toString().isEmpty())
+                {
+                    dbh.deleteStudent(et_uName.getText().toString());
+                    clearBoxes();
+                    tv_opSM.setText("Student deleted");
+                }
+            }
+        });
     }
 
     private void mainMenuBtnClick()
@@ -118,7 +142,14 @@ public class addStudent extends AppCompatActivity {
             public void onClick(View view) {
                 if(checkData())
                 {
-                    if(checkUsername())
+                    if(updateMode)
+                    {
+                        addStudentToDatabase();
+                        tv_opSM.setText("Student updated");
+                        clearBoxes();
+                    }
+
+                    if(checkUsername() && !updateMode)
                     {
                         addStudentToDatabase();
                         tv_opSM.setText("Student added");
@@ -126,13 +157,22 @@ public class addStudent extends AppCompatActivity {
                     }
                     else
                     {
-                        tv_opSM.setText("Username already exists");
+                        if(!updateMode)
+                        {
+                            tv_opSM.setText("Username already exists");
+                        }
+                        else
+                        {
+                            tv_opSM.setText("Student Updated");
+                        }
                     }
                 }
                 else
                 {
                     tv_opSM.setText("Unable to add student. Please fill all fields");
                 }
+
+                dh.setTempStudent(null);
             }
         });
     }
@@ -179,15 +219,32 @@ public class addStudent extends AppCompatActivity {
 
     private void addStudentToDatabase()
     {
-        StudentObj student = new StudentObj();
-        student.setFname(et_fName.getText().toString());
-        student.setLname(et_lName.getText().toString());
-        student.setUsername(et_uName.getText().toString());
-        student.setEmail(et_email.getText().toString());
-        student.setAge(Integer.parseInt(et_age.getText().toString()));
-        student.setGpa(Float.parseFloat(et_gpa.getText().toString()));
-        student.setMajorId(majorId);
-        dbh.addStudent(student);
+        if(majorId != -1)
+        {
+            StudentObj student = new StudentObj();
+            student.setFname(et_fName.getText().toString());
+            student.setLname(et_lName.getText().toString());
+            student.setUsername(et_uName.getText().toString());
+            student.setEmail(et_email.getText().toString());
+            Log.d("Number", et_age.getText().toString());
+            student.setAge(Integer.parseInt(et_age.getText().toString()));
+            student.setGpa(Float.parseFloat(et_gpa.getText().toString()));
+            student.setMajorid(majorId);
+
+            if(updateMode)
+            {
+                dbh.updateStudent(student);
+            }
+            else
+            {
+                dbh.addStudent(student);
+            }
+
+        }
+        else
+        {
+            Log.d("Invalid Major id", "no go!");
+        }
 
     }
 
@@ -223,9 +280,9 @@ public class addStudent extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
+
                 if(i != 0)
                 {
-                    Log.d("ID of Selected ITEM", i + "");
                     String selectedMajorName = adapterView.getItemAtPosition(i).toString();
                     for(MajorObj mObj : majorList)
                     {
@@ -235,7 +292,8 @@ public class addStudent extends AppCompatActivity {
                         }
                     }
                 }
-                Log.d("MAJOR NUMBER", majorId + "");
+
+                Log.d("MajorID: ", majorId + "");
 
             }
 
@@ -253,7 +311,6 @@ public class addStudent extends AppCompatActivity {
         if(!et_fName.getText().toString().isEmpty())
         {
             student.setFname(et_fName.getText().toString());
-            Log.d("FNAME CHECK!!!", "In fname");
         }
         if(!et_lName.getText().toString().isEmpty())
         {
@@ -270,7 +327,6 @@ public class addStudent extends AppCompatActivity {
         if(!et_age.getText().toString().isEmpty())
         {
             student.setAge(Integer.parseInt(et_age.getText().toString()));
-            Log.d("Age CHECK!!!", "In age");
         }
         if(!et_gpa.getText().toString().isEmpty())
         {

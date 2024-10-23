@@ -6,6 +6,7 @@ import android.os.Debug;
 import android.util.Log;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Intent searchStudentsScreen;
     mainViewAdapter adapter;
     DatabaseHelper dbh = new DatabaseHelper(this);
+    DataHelper dh = new DataHelper();
     private static int initialDatabaseRun = 0;
 
     @Override
@@ -50,11 +52,15 @@ public class MainActivity extends AppCompatActivity {
             initialDatabaseRun++;
         }
 
+        StudentObj student = new StudentObj();
+        dh.setTempStudent(student);
+
         adapter = new mainViewAdapter(this);
         ma_lv_studentList.setAdapter(adapter);
         openAddStudent();
-        //openSearchStudents();
+        openSearchStudents();
         adapter.notifyDataSetChanged();
+        updateStudent();
     }
 
     private void openAddStudent()
@@ -78,4 +84,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void updateStudent()
+    {
+        ma_lv_studentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                StudentObj student = adapter.getItem(i);
+                dh.setTempStudent(student);
+                startActivity(addStudentScreen);
+
+            }
+        });
+    }
 }

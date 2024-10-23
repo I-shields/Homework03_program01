@@ -8,8 +8,7 @@ public class StudentObj
     private String email;
     private int age;
     private float gpa;
-    private int majorId;
-    private int userId;
+    private int majorid;
 
     public StudentObj()
     {
@@ -35,16 +34,16 @@ public class StudentObj
         email = e;
         age = a;
         gpa = g;
-        majorId = mi;
+        majorid = mi;
 
     }
 
-    public int getMajorId() {
-        return majorId;
+    public int getMajorid() {
+        return majorid;
     }
 
-    public void setMajorId(int majorId) {
-        this.majorId = majorId;
+    public void setMajorid(int majorid) {
+        this.majorid = majorid;
     }
 
     public String getUsername() {
@@ -95,13 +94,4 @@ public class StudentObj
         this.gpa = gpa;
     }
 
-    public void setUserId(int id)
-    {
-        userId = id;
-    }
-
-    public int getUserId()
-    {
-        return userId;
-    }
 }
