@@ -1,7 +1,9 @@
+//this is the student object
 package com.example.homework03_program01;
 
 public class StudentObj
 {
+    //student variables
     private String username;
     private String fname;
     private String lname;
@@ -10,22 +12,14 @@ public class StudentObj
     private float gpa;
     private int majorid;
 
+    //constructor
     public StudentObj()
     {
 
     }
 
-    public StudentObj(String u, String fn, String ln, String e, int a, float g)
-    {
-        username = u;
-        fname = fn;
-        lname = ln;
-        email = e;
-        age = a;
-        gpa = g;
 
-    }
-
+    //I know it's unused, but it feels wrong to delete, it might be used in the future
     public StudentObj(String u, String fn, String ln, String e, int a, float g, int mi)
     {
         username = u;
@@ -37,6 +31,8 @@ public class StudentObj
         majorid = mi;
 
     }
+
+    //getters and setters
 
     public int getMajorid() {
         return majorid;

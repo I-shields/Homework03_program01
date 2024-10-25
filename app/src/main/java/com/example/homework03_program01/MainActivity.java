@@ -1,3 +1,8 @@
+//============================================================
+// Author: Isaac Shields
+// Date  : 10-25-2024
+// Desc  : Main file for this app
+//============================================================
 package com.example.homework03_program01;
 
 import android.content.Intent;
@@ -22,6 +27,7 @@ import java.io.Console;
 
 public class MainActivity extends AppCompatActivity {
 
+    //variable list
     TextView ma_tv_title;
     Button ma_btn_addStudent;
     Button ma_btn_searchStudent;
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         searchStudentsScreen    = new Intent(this, searchStudents.class);
         ma_lv_studentList       = findViewById(R.id.am_lv_studentList);
 
+        //if this is the first time loading this screen, display all
+        //database entries
         if(initialDatabaseRun == 0)
         {
             dbh.getEntries();
@@ -62,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         updateStudent();
     }
+
+    //Handles opening other screens
 
     private void openAddStudent()
     {

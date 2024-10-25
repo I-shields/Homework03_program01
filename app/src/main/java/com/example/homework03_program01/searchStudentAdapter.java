@@ -1,3 +1,4 @@
+//This is the adapter for the search screen's list view
 package com.example.homework03_program01;
 
 import android.content.Context;

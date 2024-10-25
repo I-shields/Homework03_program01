@@ -1,3 +1,8 @@
+//======================================
+// This file handles the search
+// functionality on the program
+//======================================
+
 package com.example.homework03_program01;
 
 import android.content.Intent;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 
 public class searchStudents extends AppCompatActivity {
 
+    //Variable list
 
     EditText et_searchInput;
     Spinner spin_typeSpinner;
@@ -60,11 +66,15 @@ public class searchStudents extends AppCompatActivity {
 
 
 
+        //add student search parameters to an arrayList
+        //this arrayList is passed to a spinner
         searchTypes.add("First name");
         searchTypes.add("Last name");
         searchTypes.add("Major");
         searchTypes.add("Username");
 
+        //add GPA search parameters to an arrayList
+        //this arrayList is passed to a spinner
         operations.add("=");
         operations.add(">");
         operations.add("<");
@@ -121,15 +131,16 @@ public class searchStudents extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
             {
+                //starts searching when a user starts typing
                 if(charSequence.length() >= 1)
                 {
                     et_gpaInput.setText(null);
-                    spin_typeSpinner.setSelection(0);
                     String search = charSequence.toString();
                     search = search.toLowerCase();
                     searchFunction(search);
                 }
 
+                //clear search results when the text field is empty
                 if(et_searchInput.getText().toString().isEmpty())
                 {
                     dh.clearSearchResults();
@@ -150,6 +161,9 @@ public class searchStudents extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
             {
+                //if the search parameters are changed, reset the search results
+                //and perform a new search based on the new search parameters if
+                //there is text in the search field
                 dh.clearSearchResults();
                 adapter.notifyDataSetChanged();
                 if(!et_searchInput.getText().toString().isEmpty())
@@ -167,12 +181,12 @@ public class searchStudents extends AppCompatActivity {
 
     private void searchFunction(String searchString)
     {
+        //main search function. Performs search based on the search parameters and the search string
         dh.clearSearchResults();
         adapter.notifyDataSetChanged();
 
         if(spin_typeSpinner.getSelectedItemId() == 0)
         {
-            Log.d("Search: ", "1");
             for(StudentObj student : studentList)
             {
                 if(student.getFname().toLowerCase().startsWith(searchString))
@@ -185,7 +199,6 @@ public class searchStudents extends AppCompatActivity {
 
         if(spin_typeSpinner.getSelectedItemId() == 1)
         {
-            Log.d("New search rule", "num 1");
             for(StudentObj student : studentList)
             {
                 if(student.getLname().toLowerCase().startsWith(searchString))
@@ -198,7 +211,6 @@ public class searchStudents extends AppCompatActivity {
 
         if(spin_typeSpinner.getSelectedItemId() == 3)
         {
-            Log.d("New search rule", "num 3");
             for(StudentObj student : studentList)
             {
                 if(student.getUsername().toLowerCase().startsWith(searchString))
@@ -211,7 +223,6 @@ public class searchStudents extends AppCompatActivity {
 
         if(spin_typeSpinner.getSelectedItemId() == 2)
         {
-            Log.d("New search rule", "num 2");
             for(MajorObj major : majorList)
             {
                 if(major.getMajorName().toLowerCase().startsWith(searchString))
@@ -231,6 +242,7 @@ public class searchStudents extends AppCompatActivity {
 
     private void gpaFullSearch(float gpaNum)
     {
+        //gpa search function
         dh.clearSearchResults();
         if(spin_Operation.getSelectedItemId() == 0)
         {
@@ -278,6 +290,8 @@ public class searchStudents extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
             {
+                //if theres text in the GPA search field, try to convert
+                //to a float and start the search
                 if(charSequence.length() >= 1)
                 {
                     et_searchInput.setText(null);
@@ -291,6 +305,12 @@ public class searchStudents extends AppCompatActivity {
                         Log.d("Exception: ","Unable to convert float, " + e);
                     }
                 }
+                //clear search results if theres no text
+                if(et_gpaInput.getText().toString().isEmpty())
+                {
+                    dh.clearSearchResults();
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -302,6 +322,7 @@ public class searchStudents extends AppCompatActivity {
 
     private void changeGpaParameters()
     {
+        //if there's text in the GPA search box, try to convert and perform a search
         spin_Operation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)

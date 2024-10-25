@@ -1,3 +1,11 @@
+//===========================================
+// This file handles data that needs
+// to be persistent between window changes
+// also helps to keep all the data in one
+// place so that there's no unnecessary
+// database calls or extra  large "chunks"
+// of data
+//===========================================
 package com.example.homework03_program01;
 
 import android.content.Context;
@@ -8,10 +16,13 @@ import java.util.List;
 
 public class DataHelper
 {
+    //List of variables that holds all the required semi-persistent data
     private static ArrayList<StudentObj> studentList = new ArrayList<StudentObj>();
     private static ArrayList<MajorObj> majorList = new ArrayList<MajorObj>();
     private static ArrayList<StudentObj> searchList = new ArrayList<StudentObj>();
     private static StudentObj tempStudent;
+
+    //getters and setters
 
     public ArrayList<StudentObj> getSearchList()
     {

@@ -1,3 +1,4 @@
+//This file handles adding new majors
 package com.example.homework03_program01;
 
 import android.content.Intent;
@@ -68,6 +69,7 @@ public class addMajor extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
+                //if the major doesn't exist, add it to the database
                 if(checkData())
                 {
                     updateDatabase();
@@ -76,12 +78,13 @@ public class addMajor extends AppCompatActivity {
                 }
                 else
                 {
-                    tv_opSM.setText("Error adding, please make sure boxes are filled and major does not already exist");
+                    tv_opSM.setText("Error adding, please make sure boxes are filled and major does not already exist.");
                 }
             }
         });
     }
 
+    //send data to the database file to be added to the database
     private void updateDatabase()
     {
         String majorName = et_majorName.getText().toString();
@@ -93,6 +96,7 @@ public class addMajor extends AppCompatActivity {
 
     }
 
+    //checks to see if the major exists
     private boolean checkData()
     {
         boolean validData = true;

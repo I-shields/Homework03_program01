@@ -1,6 +1,8 @@
+//this file adds students to the database
 package com.example.homework03_program01;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -65,6 +67,7 @@ public class addStudent extends AppCompatActivity {
         dbh                    = new DatabaseHelper(this);
         btn_delete             = findViewById(R.id.as_btn_delete);
 
+        //creates a list of all the major names to be passed to the major dropdown
         majorNames.add("Majors");
         for(MajorObj major : majorList)
         {
@@ -89,6 +92,8 @@ public class addStudent extends AppCompatActivity {
         if(studentList.contains(dh.getTempStudent()))
         {
             saveBtn.setText("Update");
+            et_uName.setEnabled(false);
+            et_uName.setTextColor(Color.parseColor("#808080"));
             updateMode = true;
         }
         else
@@ -98,6 +103,7 @@ public class addStudent extends AppCompatActivity {
 
     }
 
+    //deletes a student
     private void deleteBtn()
     {
         btn_delete.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +141,7 @@ public class addStudent extends AppCompatActivity {
         });
     }
 
+    //saves or updates a student
     private void saveBtnClick()
     {
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +184,8 @@ public class addStudent extends AppCompatActivity {
         });
     }
 
+
+    //makes sure all the textboxes are filled
     private boolean checkData()
     {
         boolean valid = false;
@@ -189,6 +198,7 @@ public class addStudent extends AppCompatActivity {
         return valid;
     }
 
+    //checks the username
     private boolean checkUsername()
     {
         boolean validUname = true;
@@ -214,9 +224,9 @@ public class addStudent extends AppCompatActivity {
         et_gpa.setText(null);
         et_age.setText(null);
         spinner_majorSpinner.setSelection(0);
-        tv_opSM.setText(null);
     }
 
+    //add student tp the database
     private void addStudentToDatabase()
     {
         if(majorId != -1)
@@ -248,6 +258,7 @@ public class addStudent extends AppCompatActivity {
 
     }
 
+    //when the user comes back fill the data they entered, if any
     private void fillTempData(StudentObj student)
     {
         et_fName.setText(student.getFname());
@@ -271,8 +282,14 @@ public class addStudent extends AppCompatActivity {
         {
             et_gpa.setText(String.valueOf(student.getGpa()));
         }
+
+        if(student.getMajorid() != 0)
+        {
+            spinner_majorSpinner.setSelection(student.getMajorid());
+        }
     }
 
+    //gets the major id
     private void getMajorId()
     {
 
@@ -305,6 +322,7 @@ public class addStudent extends AppCompatActivity {
 
     }
 
+    //saves the available info when the user goes to add a major
     private void saveTempData()
     {
         StudentObj student = new StudentObj();
@@ -331,6 +349,10 @@ public class addStudent extends AppCompatActivity {
         if(!et_gpa.getText().toString().isEmpty())
         {
             student.setGpa(Float.parseFloat(et_gpa.getText().toString()));
+        }
+        if(spinner_majorSpinner.getSelectedItemId() != 0)
+        {
+            student.setMajorid((int) spinner_majorSpinner.getSelectedItemId());
         }
 
         dh.setTempStudent(student);

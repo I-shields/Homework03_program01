@@ -128,6 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<MajorObj> majorList = new ArrayList<>();
+        //part 2 of getting all the majors in the major table
         Cursor cursor = getMajorCursor();
         if(cursor != null && cursor.getCount() > 0)
         {
@@ -153,26 +154,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return majorList;
     }
 
-    private boolean validMajorId(int id)
-    {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String checkCommand = "SELECT count(majorId) FROM " + majorTableName + " WHERE majorId = '" + id + "';";
-        Cursor cursor = db.rawQuery(checkCommand, null);
-        cursor.moveToFirst();
-        int count = cursor.getInt(0);
-        db.close();
-        if(count != 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     private boolean validStudentId(String uid)
     {
+        //checks to see if the username is valid
         SQLiteDatabase db = this.getReadableDatabase();
         String checkCommand = "SELECT count(username) FROM " + studentTableName + " WHERE username = '" + uid + "';";
         Cursor cursor = db.rawQuery(checkCommand, null);
@@ -191,12 +175,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public void getEntries()
     {
+        //update the list in the "DataHelper" class
         dh.setMajorList(getAllMajors());
         dh.setStudentList(getAllStudents());
     }
 
     public void updateStudent(StudentObj student)
     {
+        //update a student if the username is valid
         if(validStudentId(student.getUsername()))
         {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -208,6 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public void deleteStudent(String uname)
     {
+        //delete a student if the username is valid
         if(validStudentId(uname))
         {
             SQLiteDatabase db = this.getWritableDatabase();

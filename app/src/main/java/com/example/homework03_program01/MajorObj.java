@@ -1,3 +1,4 @@
+// This is the major object
 package com.example.homework03_program01;
 
 public class MajorObj

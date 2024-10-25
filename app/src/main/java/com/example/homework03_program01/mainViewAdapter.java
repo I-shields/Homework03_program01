@@ -1,3 +1,5 @@
+// This file is used for the main window's list view
+
 package com.example.homework03_program01;
 
 import android.content.Context;

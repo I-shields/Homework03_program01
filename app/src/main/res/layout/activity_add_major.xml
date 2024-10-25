@@ -85,13 +85,10 @@
         android:id="@+id/amj_tv_opSM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="204dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/amj_btn_saveMajor"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="272dp"
+        android:textAlignment="textStart"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/amj_et_majorPrefix"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
