@@ -70,7 +70,7 @@ public class searchStudentAdapter extends BaseAdapter
         {
             if(majorobj.getMajorId() == student.getMajorid())
             {
-                major.setText("Major" + majorobj.getMajorName());
+                major.setText("Major: " + majorobj.getMajorName());
             }
         }
 
